@@ -13,7 +13,7 @@ def get_movie_library(list_type):
     return response.json()
 
 
-def get_poster_url(poster_api_path, size):
+def get_poster_url(poster_api_path, size='w342'):
     base_url = "https://image.tmdb.org/t/p/"
     return f"{base_url}{size}/{poster_api_path}"
 
