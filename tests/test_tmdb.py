@@ -1,6 +1,9 @@
+import pytest
+
 import tmdb_client
 from tmdb_client import *
 from unittest.mock import Mock
+from main import app
 
 '''
 def test_mocking(monkeypatch):
@@ -25,7 +28,7 @@ def test_get_poster_url_uses_default_size():
 def test_get_movies_list_type_popular():
     movies_list = get_movie_library(list_type="popular")
     assert movies_list is not None
-'''
+
 
 def test_get_movies_library(monkeypatch):
     # Lista , którą będzie zwracać przysłonięte "zapytanie do Api"
@@ -40,7 +43,7 @@ def test_get_movies_library(monkeypatch):
 
     movies_list = tmdb_client.get_movie_library(list_type="popular")
     assert movies_list == mock_movie_list
-
+'''
 
 def test_get_single_movie(monkeypatch):
    mock_single_movie_url = "URL"
@@ -76,3 +79,19 @@ def test_single_movie_cast(monkeypatch):
 
    movie_cast = tmdb_client.get_single_movie('379686')
    assert movie_cast == mock_single_movie_cast
+
+
+@pytest.mark.parametrize('list_type, result',(
+        ('popular', 'movie/popular'),
+        ('top_rated', 'movie/top_rated'),
+        ('upcoming', 'movie/upcoming')
+))
+def test_homepage(monkeypatch,list_type, result):
+    api_mock = Mock(return_value={"results": []})
+    monkeypatch.setattr("tmdb_client.call_tmdb_api", api_mock)
+
+    with app.test_client() as client:
+        response = client.get('/')
+        assert response.status_code == 200
+        assert get_single_movie(list_type) == call_tmdb_api(result)
+
